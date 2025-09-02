@@ -39,7 +39,6 @@ add_library(utf8 SHARED
     "src/codepoint.c"
     "src/grapheme-data.c"
     "src/grapheme.c"
-    "src/string.c"
     "src/path.c"
 )
 target_include_directories(utf8 PUBLIC include)
