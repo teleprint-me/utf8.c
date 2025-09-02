@@ -1,0 +1,8 @@
+CompileFlags:
+  Add: [
+    -ferror-limit=0,
+    -xc,
+    -I/usr/include,
+    -I/usr/local/include,
+    -I./include,
+  ]
