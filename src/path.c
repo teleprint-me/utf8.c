@@ -6,27 +6,28 @@
  * @brief
  */
 
-#include "logger.h"
-#include "utf8/path.h"
+#include <stdio.h>
+
+#include "path.h"
 
 // PathInfo lifecycle
 
 // Retrieves metadata (caller must free)
 PathInfo* path_create_info(const char* path) {
     if (!path) {
-        LOG_ERROR("Path is NULL!\n");
+        fprintf(stderr, "Path is NULL!\n");
         return NULL;
     }
 
     struct stat statbuf;
     if (stat(path, &statbuf) != 0) {
-        LOG_ERROR("Failed to stat path '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "Failed to stat path '%s': %s\n", path, strerror(errno));
         return NULL;
     }
 
     PathInfo* info = (PathInfo*) malloc(sizeof(PathInfo));
     if (!info) {
-        LOG_ERROR("Failed to allocate memory for PathInfo.\n");
+        fprintf(stderr, "Failed to allocate memory for PathInfo.\n");
         return NULL;
     }
 
@@ -123,7 +124,7 @@ PathEntry* path_create_entry(const char* path, int current_depth, int max_depth)
 
     DIR* dir = opendir(path);
     if (!dir) {
-        LOG_ERROR("Failed to open directory '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "Failed to open directory '%s': %s\n", path, strerror(errno));
         return NULL;
     }
 
@@ -144,13 +145,13 @@ PathEntry* path_create_entry(const char* path, int current_depth, int max_depth)
 
         char* entry_path = path_join(path, dir_entry->d_name);
         if (!entry_path) {
-            LOG_ERROR("Failed to join path for '%s'.\n", dir_entry->d_name);
+            fprintf(stderr, "Failed to join path for '%s'.\n", dir_entry->d_name);
             continue;
         }
 
         PathInfo* info = path_create_info(entry_path);
         if (!info) {
-            LOG_ERROR("Failed to retrieve metadata for '%s'.\n", entry_path);
+            fprintf(stderr, "Failed to retrieve metadata for '%s'.\n", entry_path);
             path_free_string(entry_path);
             continue;
         }
@@ -275,7 +276,7 @@ bool path_is_directory(const char* path) {
 
     struct stat buffer;
     if (stat(path, &buffer) != 0) {
-        LOG_ERROR("Failed to stat path '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "Failed to stat path '%s': %s\n", path, strerror(errno));
         return false;
     }
     return S_ISDIR(buffer.st_mode);
@@ -289,7 +290,7 @@ bool path_is_file(const char* path) {
 
     struct stat buffer;
     if (stat(path, &buffer) != 0) {
-        LOG_ERROR("Failed to stat path '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "Failed to stat path '%s': %s\n", path, strerror(errno));
         return false;
     }
     return S_ISREG(buffer.st_mode);
@@ -303,7 +304,7 @@ bool path_is_symlink(const char* path) {
 
     struct stat buffer;
     if (lstat(path, &buffer) != 0) {
-        LOG_ERROR("Failed to lstat path '%s': %s\n", path, strerror(errno));
+        fprintf(stderr, "Failed to lstat path '%s': %s\n", path, strerror(errno));
         return false;
     }
     return S_ISLNK(buffer.st_mode);

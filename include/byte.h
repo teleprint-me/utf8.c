@@ -106,6 +106,8 @@ typedef enum UTF8ByteCompare {
  */
 int8_t utf8_byte_cmp(const uint8_t* a, const uint8_t* b);
 
+void* utf8_byte_realloc(void* ptr, size_t old_size, size_t new_size);
+
 /**
  * @brief Appends a pointer to a dynamic array of uint8_t* pointers, resizing as needed.
  *

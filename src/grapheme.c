@@ -12,14 +12,14 @@
  * @ref https://www.unicode.org/Public/UCD/latest/ucd/
  */
 
-#include "posix.h"  // IWYU pragma: keep
-#include "memory.h"
-#include "utf8/codepoint.h"
-#include "utf8/grapheme-data.h"
-#include "utf8/grapheme.h"
 #include <stdint.h>
 #include <string.h>  // only for mem*() functions
 #include <stdio.h>
+
+#include "byte.h"
+#include "codepoint.h"
+#include "grapheme-data.h"
+#include "grapheme.h"
 
 /**
  * @note The database is automated and then compiled from source into a
@@ -216,7 +216,7 @@ char** utf8_gcb_split(const char* src, size_t* capacity) {
     }
 
     *capacity = 0;
-    char** parts = memory_alloc(sizeof(char*), alignof(char*));
+    char** parts = calloc(1, sizeof(char*));
 
     UTF8GraphemeBuffer gb = {0};
 
@@ -232,12 +232,14 @@ char** utf8_gcb_split(const char* src, size_t* capacity) {
         if (i != 0 && utf8_gcb_is_break(&gb, curr_cp)) {
             // End of previous cluster
             size_t cluster_len = i - cluster_start;
-            char* cluster = memory_alloc(cluster_len + 1, alignof(char));
+            char* cluster = calloc(cluster_len + 1, sizeof(char));
             memcpy(cluster, &stream[cluster_start], cluster_len);
             cluster[cluster_len] = '\0';
 
-            parts = memory_realloc(
-                parts, sizeof(char*) * (*capacity), sizeof(char*) * (*capacity + 1), alignof(char*)
+            parts = utf8_byte_realloc(
+                parts,
+                sizeof(char*) * (*capacity), // old size
+                sizeof(char*) * (*capacity + 1) // new_size
             );
             parts[(*capacity)++] = cluster;
             cluster_start = i;
@@ -250,12 +252,14 @@ char** utf8_gcb_split(const char* src, size_t* capacity) {
     // Copy final cluster
     if (cluster_start < len) {
         size_t cluster_len = len - cluster_start;
-        char* cluster = memory_alloc(cluster_len + 1, alignof(char));
+        char* cluster = calloc(cluster_len + 1, sizeof(char));
         memcpy(cluster, &stream[cluster_start], cluster_len);
         cluster[cluster_len] = '\0';
 
-        parts = memory_realloc(
-            parts, sizeof(char*) * (*capacity), sizeof(char*) * (*capacity + 1), alignof(char*)
+        parts = utf8_byte_realloc(
+            parts,
+            sizeof(char*) * (*capacity), // old size
+            sizeof(char*) * (*capacity + 1) // new size
         );
         parts[(*capacity)++] = cluster;
     }

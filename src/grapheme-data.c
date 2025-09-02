@@ -6,7 +6,7 @@
  * @date 2025-08-03
  */
 
-#include "utf8/grapheme-data.h"
+#include "grapheme-data.h"
 
 const UTF8Grapheme graphemes[] = {
     {0x000600, 0x000605, GCB_PREPEND}, // CR

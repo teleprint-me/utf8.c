@@ -15,10 +15,11 @@
  * - Codepoint-level operations are prefixed with `utf8_cp_`.
  */
 
-#include "memory.h"
-#include "logger.h"
-#include "utf8/codepoint.h"
 #include <string.h>  // memcpy and friends
+#include <stdio.h>
+
+#include "byte.h"
+#include "codepoint.h"
 
 // --- UTF-8 Codepoint Operations ---
 
@@ -166,7 +167,7 @@ uint8_t* utf8_cp_copy(const uint8_t* start) {
         return NULL;
     }
 
-    uint8_t* dst = memory_alloc(sizeof(uint8_t) * width + 1, alignof(uint8_t));
+    uint8_t* dst = calloc(width + 1, sizeof(uint8_t));
     if (!dst) {
         return NULL;
     }
@@ -217,11 +218,11 @@ void utf8_cp_dump(const uint8_t* start) {
     while (start[i]) {
         int8_t width = utf8_cp_width(&start[i]);
         if (-1 == width) {
-            LOG_ERROR("Invalid byte width detected!\n");
+            fprintf(stderr, "Invalid byte width detected!\n");
             break;
         }
         if (!utf8_cp_is_valid(&start[i])) {
-            LOG_ERROR("Invalid byte detected!\n");
+            fprintf(stderr, "Invalid byte detected!\n");
             break;
         }
 
@@ -481,7 +482,7 @@ uint8_t** utf8_cp_split(const uint8_t* start, size_t* capacity) {
     }
 
     *capacity = 0;
-    uint8_t** parts = memory_alloc(sizeof(char*), alignof(char*));
+    uint8_t** parts = calloc(1, sizeof(char*));
     const uint8_t* stream = (const uint8_t*) start;
 
     while (*stream) {
@@ -495,11 +496,10 @@ uint8_t** utf8_cp_split(const uint8_t* start, size_t* capacity) {
             goto fail;
         }
 
-        uint8_t** temp = memory_realloc(
+        uint8_t** temp = utf8_byte_realloc(
             parts,
             sizeof(uint8_t*) * (*capacity),  // old_size
-            sizeof(uint8_t*) * (*capacity + 1),  // new_size
-            alignof(uint8_t*)
+            sizeof(uint8_t*) * (*capacity + 1)  // new_size
         );
 
         if (!temp) {

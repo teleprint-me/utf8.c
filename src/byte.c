@@ -11,11 +11,11 @@
  * All functions treat empty strings ("") as valid input.
  */
 
-#include "regex.h"
-#include "byte.h"
-
 #include <stddef.h>
 #include <string.h>
+
+#include "regex.h"
+#include "byte.h"
 
 // Returns the number of bytes before the null terminator.
 int64_t utf8_byte_count(const uint8_t* start) {
@@ -51,7 +51,7 @@ uint8_t* utf8_byte_copy(const uint8_t* start) {
         return NULL;
     }
 
-    uint8_t* dst = memory_alloc((count + 1) * sizeof(uint8_t), alignof(uint8_t));
+    uint8_t* dst = calloc((count + 1), sizeof(uint8_t));
     if (!dst) {
         return NULL;
     }
@@ -75,7 +75,7 @@ uint8_t* utf8_byte_copy_n(const uint8_t* start, uint64_t n) {
         return NULL;
     }
 
-    uint8_t* dst = memory_alloc((n + 1) * sizeof(uint8_t), alignof(uint8_t));
+    uint8_t* dst = calloc((n + 1), sizeof(uint8_t));
     if (!dst) {
         return NULL;
     }
@@ -114,7 +114,7 @@ uint8_t* utf8_byte_cat(const uint8_t* dst, const uint8_t* src) {
     }
 
     size_t out_n = (size_t) (dst_n + src_n);
-    uint8_t* out = memory_alloc((out_n + 1) * sizeof(uint8_t), alignof(uint8_t));
+    uint8_t* out = calloc((out_n + 1), sizeof(uint8_t));
     if (!out) {
         return NULL;
     }
@@ -161,6 +161,28 @@ int8_t utf8_byte_cmp(const uint8_t* a, const uint8_t* b) {
     return UTF8_COMPARE_EQUAL;
 }
 
+void* utf8_byte_realloc(void* ptr, size_t old_size, size_t new_size) {
+    if (NULL == ptr) {
+        return calloc(new_size, sizeof(uint8_t));
+    }
+
+    if (0 == new_size) {
+        free(ptr);
+        return NULL;
+    }
+
+    void* new_ptr = calloc(new_size, sizeof(uint8_t));
+    if (NULL == new_ptr) {
+        return NULL;
+    }
+
+    // Copy only the smaller of the old or new sizes
+    size_t min_size = old_size < new_size ? old_size : new_size;
+    memcpy(new_ptr, ptr, min_size);
+    free(ptr);
+    return new_ptr;
+}
+
 uint8_t** utf8_byte_append(const uint8_t* src, uint8_t** parts, uint64_t* count) {
     if (!src || !parts || !count) {
         return NULL;
@@ -168,7 +190,7 @@ uint8_t** utf8_byte_append(const uint8_t* src, uint8_t** parts, uint64_t* count)
 
     size_t old_size = sizeof(uint8_t*) * (*count);
     size_t new_size = sizeof(uint8_t*) * (*count + 1);
-    uint8_t** temp = memory_realloc(parts, old_size, new_size, alignof(uint8_t*));
+    uint8_t** temp = utf8_byte_realloc(parts, old_size, new_size);
     if (!temp) {
         return NULL;
     }
@@ -192,7 +214,7 @@ uint8_t** utf8_byte_append_n(
 
     uint8_t** temp = utf8_byte_append(dst, parts, count);
     if (!temp) {
-        memory_free(dst);
+        free(dst);
         return NULL;
     }
 
@@ -213,7 +235,7 @@ uint8_t** utf8_byte_append_slice(
 
     uint8_t** temp = utf8_byte_append(slice, parts, count);
     if (!temp) {
-        memory_free(slice);
+        free(slice);
         return NULL;
     }
 
@@ -226,14 +248,14 @@ uint8_t** utf8_byte_split(const uint8_t* src, uint64_t* count) {
     }
 
     *count = 0;
-    uint8_t** parts = memory_alloc(sizeof(uint8_t*), alignof(uint8_t*));
+    uint8_t** parts = calloc(1, sizeof(uint8_t*));
     int64_t len = utf8_byte_count(src);
     if (!parts || len < 0) {
         return NULL;
     }
 
     for (int64_t i = 0; i < len; i++) {
-        uint8_t* chunk = memory_alloc(2 * sizeof(uint8_t), alignof(uint8_t));
+        uint8_t* chunk = calloc(2, sizeof(uint8_t));
         if (!chunk) {
             // Optionally: free previous parts
             return NULL;
@@ -243,7 +265,7 @@ uint8_t** utf8_byte_split(const uint8_t* src, uint64_t* count) {
 
         parts = utf8_byte_append(chunk, parts, count);
         if (!parts) {
-            memory_free(chunk);
+            free(chunk);
             // Optionally: free previous parts
             return NULL;
         }
@@ -255,9 +277,9 @@ uint8_t** utf8_byte_split(const uint8_t* src, uint64_t* count) {
 void utf8_byte_split_free(uint8_t** parts, uint64_t count) {
     if (parts) {
         for (uint64_t i = 0; i < count; i++) {
-            memory_free(parts[i]);
+            free(parts[i]);
         }
-        memory_free(parts);
+        free(parts);
     }
 }
 
@@ -278,7 +300,7 @@ uint8_t** utf8_byte_split_delim(const uint8_t* src, const uint8_t* delim, uint64
     }
 
     *count = 0;
-    uint8_t** parts = memory_alloc(sizeof(uint8_t*), alignof(uint8_t*));
+    uint8_t** parts = calloc(1, sizeof(uint8_t*));
     if (!parts) {
         return NULL;
     }
@@ -324,7 +346,7 @@ uint8_t** utf8_byte_split_regex(const uint8_t* src, const uint8_t* pattern, uint
         return NULL;
     }
 
-    uint8_t** parts = memory_alloc(sizeof(uint8_t*), alignof(uint8_t*));
+    uint8_t** parts = calloc(1, sizeof(uint8_t*));
     int64_t total_bytes = utf8_byte_count(src);
     if (!parts || total_bytes <= 0) {
         utf8_regex_free(code, match);
@@ -381,7 +403,7 @@ uint8_t* utf8_byte_join(uint8_t** parts, uint64_t count, const uint8_t* delim) {
     }
 
     // Allocate output buffer
-    uint8_t* buffer = memory_alloc(total * sizeof(uint8_t), alignof(uint8_t));
+    uint8_t* buffer = calloc(total, sizeof(uint8_t));
     if (!buffer) {
         return NULL;
     }
