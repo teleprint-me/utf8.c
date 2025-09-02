@@ -1,4 +1,6 @@
-// @file utf8/tests/test_utf8_byte.c
+/**
+ * @file utf8/tests/test_utf8_byte.c
+ */
 
 #include "byte.h"
 #include "test.h"
@@ -14,8 +16,9 @@ int test_group_utf8_byte_count(TestUnit* unit) {
     int64_t actual = utf8_byte_count(data->payload);
 
     // Check if the actual count matches the expected count
-    ASSERT(
-        actual == data->expected,
+    ASSERT_EQ(
+        actual,
+        data->expected,
         "[TestUTF8ByteCount] Failed: unit=%zu, payload='%s', expected=%ld, got=%ld",
         unit->index,
         data->payload,
@@ -69,8 +72,9 @@ int test_group_utf8_byte_diff(TestUnit* unit) {
     const uint8_t* end = data->payload ? data->payload + data->end : NULL;
     ptrdiff_t actual = utf8_byte_diff(start, end);
 
-    ASSERT(
-        actual == data->expected,
+    ASSERT_EQ(
+        actual,
+        data->expected,
         "[TestUTF8ByteDiff] Failed: unit=%zu, payload='%s', expected=%ld, got=%ld",
         unit->index,
         data->payload ? (char*) data->payload : "NULL",
@@ -84,7 +88,7 @@ int test_group_utf8_byte_diff(TestUnit* unit) {
 int test_suite_utf8_byte_diff(void) {
     TestUTF8ByteDiff data[] = {
         {"NULL start", NULL, 0, 1, -1},  // nul input
-        {"NULL end", (uint8_t*) "abc", 0, 0, 0},  // no diff
+        {"start == end", (uint8_t*) "abc", 0, 0, -1},  // no diff
         {"end < start", (uint8_t*) "abc", 2, 1, -1},
         {"diff 0", (uint8_t*) "abc", 0, 0, 0},
         {"diff 2", (uint8_t*) "abc", 0, 2, 2},
