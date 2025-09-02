@@ -23,12 +23,20 @@ int test_group_utf8_byte_count(TestUnit* unit) {
         actual
     );
 
-    return 0; // Success
+    return 0;  // Success
 }
 
 int test_suite_utf8_byte_count(void) {
     TestUTF8ByteCount data[] = {
+        {"NULL", NULL, -1},
         {"Empty", (const uint8_t*) "", 0},
+        {"ASCII NULL", (const uint8_t*) "\0", 0},
+        {"ASCII a", (const uint8_t*) "a", 1},
+        {"ASCII DEL", (const uint8_t*) "\x7F", 1},
+        {"2-byte ¢", (const uint8_t*) "\u00A2", 2},
+        {"3-byte €", (const uint8_t*) "\u20AC", 3},
+        {"4-byte 😀", (const uint8_t*) "\U0001F600", 4},
+        {"Hello", (const uint8_t*) "Hello!", 6},
     };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCount);
 
@@ -43,7 +51,7 @@ int test_suite_utf8_byte_count(void) {
         .units = units,
         .run = test_group_utf8_byte_count,
     };
-    
+
     return test_group_run(&group);
 }
 
