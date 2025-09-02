@@ -34,6 +34,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Add library
 add_library(utf8 SHARED
+    "src/test.c"
     "src/regex.c"
     "src/byte.c"
     "src/codepoint.c"
@@ -43,3 +44,6 @@ add_library(utf8 SHARED
 )
 target_include_directories(utf8 PUBLIC include)
 target_link_libraries(utf8 PUBLIC m pcre2-8)
+
+enable_testing()
+add_subdirectory(tests)
