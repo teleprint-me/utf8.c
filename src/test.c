@@ -10,16 +10,16 @@
 
 int test_group_run(TestGroup* group) {
     if (!group || !group->name || !group->units || group->count == 0 || !group->run) {
-        fprintf(stderr, "[TestGroup] Invalid parameters.");
+        fprintf(stderr, "[TestGroup] Invalid parameters.\n");
         return -1;
     }
 
-    fprintf(stdout, "[TestGroup] [RUN] %s: Number of tests: %zu", group->name, group->count);
+    fprintf(stdout, "[TestGroup] [RUN] %s: Number of tests: %zu\n", group->name, group->count);
 
     size_t failures = 0;
 
     if (group->before_all && group->before_all(group) != 0) {
-        fprintf(stderr, "[TestGroup] [FAIL] %s: Group setup failed.", group->name);
+        fprintf(stderr, "[TestGroup] [FAIL] %s: Group setup failed.\n", group->name);
         return 1;
     }
 
@@ -41,34 +41,34 @@ int test_group_run(TestGroup* group) {
 
         if (result != 0) {
             failures++;
-            fprintf(stderr, "[TestGroup] [FAIL] %s: Test case %zu failed.", group->name, unit->index);
+            fprintf(stderr, "[TestGroup] [FAIL] %s: Test case %zu failed.\n", group->name, unit->index);
         }
     }
 
     if (group->after_all && group->after_all(group) != 0) {
-        fprintf(stderr, "[TestGroup] [FAIL] %s: Group teardown failed.", group->name);
+        fprintf(stderr, "[TestGroup] [FAIL] %s: Group teardown failed.\n", group->name);
         return 1;
     }
 
     size_t passed = group->count - failures;
-    fprintf(stdout, "[TestGroup] [RESULT] %s: %zu/%zu tests passed", group->name, passed, group->count);
+    fprintf(stdout, "[TestGroup] [RESULT] %s: %zu/%zu tests passed\n", group->name, passed, group->count);
 
     return (failures) > 0 ? 1 : 0;
 }
 
 int test_suite_run(TestSuite* suite) {
     if (!suite || !suite->name || !suite->run) {
-        fprintf(stderr, "[TestSuite] Invalid parameters.");
+        fprintf(stderr, "[TestSuite] Invalid parameters.\n");
         return -1;
     }
 
-    fprintf(stdout, "[TestSuite] [RUN] %s", suite->name);
+    fprintf(stdout, "[TestSuite] [RUN] %s\n", suite->name);
 
     int result = suite->run();
     if (result == 0) {
-        fprintf(stdout, "[TestSuite] [PASS] %s", suite->name);
+        fprintf(stdout, "[TestSuite] [PASS] %s\n", suite->name);
     } else {
-        fprintf(stderr, "[TestSuite] [FAIL] %s", suite->name);
+        fprintf(stderr, "[TestSuite] [FAIL] %s\n", suite->name);
     }
     return result;
 }
