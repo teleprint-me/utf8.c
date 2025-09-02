@@ -13,14 +13,6 @@ int test_group_utf8_byte_count(TestUnit* unit) {
     TestUTF8ByteCount* data = (TestUTF8ByteCount*) unit->data;
     int64_t actual = utf8_byte_count(data->start);
 
-    // Check if the actual length is greater than 0
-    ASSERT(
-        actual > 0,
-        "[TestUTF8ByteCount] Invalid lead byte: unit=%zu, data='%s'",
-        unit->index,
-        data->start
-    );
-
     // Check if the actual length matches the expected length
     ASSERT(
         actual == data->expected,
