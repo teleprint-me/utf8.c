@@ -13,6 +13,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 /**
  * @name Forward Declarations
@@ -63,7 +64,7 @@ typedef struct TestSuite TestSuite;
 #define ASSERT(condition, format, ...) \
     do { \
         if (!(condition)) { \
-            LOG_ERROR(format, ##__VA_ARGS__); \
+            fprintf(stderr, format, ##__VA_ARGS__); \
             return 1; \
         } \
     } while (0)
