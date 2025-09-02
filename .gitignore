@@ -2,6 +2,10 @@
 # C ignore rules
 #
 
+# CMake output
+.cache/
+build/
+
 # Prerequisites
 *.d
 
