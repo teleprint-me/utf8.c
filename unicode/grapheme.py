@@ -17,8 +17,8 @@ Features
 
 Output
 ------
-- include/utf8/grapheme-data.h    # Grapheme type enum + lookup struct
-- src/utf8/grapheme-data.c        # Data array of Unicode codepoint ranges
+- include/grapheme-data.h    # Grapheme type enum + lookup struct
+- src/grapheme-data.c        # Data array of Unicode codepoint ranges
 
 Usage
 -----
@@ -232,7 +232,7 @@ def unicode_data_source(ranges: list[tuple[int, int, int]]) -> str:
 
     lines = unicode_data_comments()
 
-    lines.append('#include "utf8/grapheme-data.h"\n')
+    lines.append('#include "grapheme-data.h"\n')
 
     lines.append("const UTF8Grapheme graphemes[] = {")
     for lo, hi, t in ranges:
@@ -251,11 +251,11 @@ def main():
     data = unicode_data_parse(cache)
 
     header = unicode_data_include(data)
-    with open("include/utf8/grapheme-data.h", "w") as file:
+    with open("include/grapheme-data.h", "w") as file:
         file.write(header)
 
     source = unicode_data_source(data)
-    with open("src/utf8/grapheme-data.c", "w") as file:
+    with open("src/grapheme-data.c", "w") as file:
         file.write(source)
 
 
