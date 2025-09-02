@@ -64,10 +64,14 @@ typedef struct TestSuite TestSuite;
 #define ASSERT(condition, format, ...) \
     do { \
         if (!(condition)) { \
-            fprintf(stderr, format "\n", ##__VA_ARGS__); \
+            fprintf(stderr, "[%s:%d] " format "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
             return 1; \
         } \
     } while (0)
+
+#define ASSERT_EQ(actual, expected, ...) ASSERT((actual) == (expected), __VA_ARGS__)
+
+#define ASSERT_NEQ(actual, expected, ...) ASSERT((actual) != (expected), __VA_ARGS__)
 
 /** @} */
 
@@ -170,4 +174,4 @@ int test_suite_run(TestSuite* suite);
 
 /** @} */
 
-#endif // UNIT_TEST_H
+#endif  // UNIT_TEST_H
