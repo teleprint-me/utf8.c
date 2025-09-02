@@ -16,7 +16,7 @@ int test_group_utf8_byte_count(TestUnit* unit) {
     // Check if the actual length is greater than 0
     ASSERT(
         actual > 0,
-        "[TestUTF8ByteWidth] Invalid lead byte: unit=%zu, data='%s'",
+        "[TestUTF8ByteCount] Invalid lead byte: unit=%zu, data='%s'",
         unit->index,
         data->start
     );
@@ -24,7 +24,7 @@ int test_group_utf8_byte_count(TestUnit* unit) {
     // Check if the actual length matches the expected length
     ASSERT(
         actual == data->expected,
-        "[TestUTF8ByteWidth] Invalid byte length: unit=%zu, data='%s', expected=%ld, got=%ld",
+        "[TestUTF8ByteCount] Invalid byte length: unit=%zu, data='%s', expected=%ld, got=%ld",
         unit->index,
         data->start,
         data->expected,
