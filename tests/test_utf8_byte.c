@@ -3,8 +3,56 @@
 #include "byte.h"
 #include "test.h"
 
+typedef struct TestUTF8ByteCount {
+    const char* label;
+    const uint8_t* start;
+    const int64_t expected;
+} TestUTF8ByteCount;
+
+int test_group_utf8_byte_count(TestUnit* unit) {
+    TestUTF8ByteCount* data = (TestUTF8ByteCount*) unit->data;
+    int64_t actual = utf8_byte_count(data->start);
+
+    // Check if the actual length is greater than 0
+    ASSERT(
+        actual > 0,
+        "[TestUTF8ByteWidth] Invalid lead byte: unit=%zu, data='%s'",
+        unit->index,
+        data->start
+    );
+
+    // Check if the actual length matches the expected length
+    ASSERT(
+        actual == data->expected,
+        "[TestUTF8ByteWidth] Invalid byte length: unit=%zu, data='%s', expected=%ld, got=%ld",
+        unit->index,
+        data->start,
+        data->expected,
+        actual
+    );
+
+    return 0; // Success
+}
+
 int test_suite_utf8_byte_count(void) {
-    return 0;
+    TestUTF8ByteCount data[] = {
+        {"Empty", (const uint8_t*) "", 0},
+    };
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteCount);
+
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "utf8_byte_count",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_count,
+    };
+    
+    return test_group_run(&group);
 }
 
 int main(void) {
