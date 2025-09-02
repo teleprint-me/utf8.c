@@ -64,7 +64,7 @@ typedef struct TestSuite TestSuite;
 #define ASSERT(condition, format, ...) \
     do { \
         if (!(condition)) { \
-            fprintf(stderr, format, ##__VA_ARGS__); \
+            fprintf(stderr, format "\n", ##__VA_ARGS__); \
             return 1; \
         } \
     } while (0)
