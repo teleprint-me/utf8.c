@@ -232,6 +232,19 @@ int test_suite_utf8_byte_cmp(void) {
         {"Equal", (uint8_t*) "abc", (uint8_t*) "abc", UTF8_COMPARE_EQUAL},  // 0
         {"Less", (uint8_t*) "abc", (uint8_t*) "def", UTF8_COMPARE_LESS},  // -1
         {"Greater", (uint8_t*) "def", (uint8_t*) "abc", UTF8_COMPARE_GREATER},  // 1
+        {"Left NULL", NULL, (uint8_t*) "abc", UTF8_COMPARE_INVALID},
+        {"Right NULL", (uint8_t*) "abc", NULL, UTF8_COMPARE_INVALID},
+        {"Shorter", (uint8_t*) "abc", (uint8_t*) "abcd", UTF8_COMPARE_LESS},
+        {"Longer", (uint8_t*) "abcd", (uint8_t*) "abc", UTF8_COMPARE_GREATER},
+        {"Multibyte less",
+         (uint8_t*) "\xC2\xA2",
+         (uint8_t*) "\xE2\x82\xAC",
+         UTF8_COMPARE_LESS},  // ¢ vs €
+        {"Multibyte greater",
+         (uint8_t*) "\xE2\x82\xAC",
+         (uint8_t*) "\xC2\xA2",
+         UTF8_COMPARE_GREATER},  // € vs ¢
+
     };
     size_t count = sizeof(data) / sizeof(TestUtf8ByteCmp);
 
