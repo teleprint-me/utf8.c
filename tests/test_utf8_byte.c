@@ -296,6 +296,37 @@ int test_group_utf8_byte_slice(TestUnit* unit) {
     uint8_t* actual = utf8_byte_copy_slice(start, end);
 
     if (actual && data->src) {
+        int64_t expected_len = utf8_byte_count(data->expected);
+        int64_t actual_len = utf8_byte_count(actual);
+        ASSERT_EQ(
+            actual_len,
+            expected_len,
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected len=%ld, got=%ld",
+            unit->index,
+            data->label,
+            expected_len,
+            actual_len
+        );
+
+        int64_t result = memcmp(actual, data->expected, expected_len + 1);
+        ASSERT_EQ(
+            result,
+            0,  // expected
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected='%s', got='%s'",
+            unit->index,
+            data->label,
+            data->expected,
+            actual
+        );
+
+        // No aliasing
+        ASSERT_NEQ(
+            (uintptr_t) actual,
+            (uintptr_t) data->src,
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, result is aliased",
+            unit->index,
+            data->label
+        );
     } else {
         // Expect failure (NULL result)
         ASSERT_EQ(
