@@ -10,21 +10,21 @@
 
 typedef struct TestUTF8ByteCount {
     const char* label;
-    const uint8_t* payload;
+    const uint8_t* src;
     const int64_t expected;
 } TestUTF8ByteCount;
 
 int test_group_utf8_byte_count(TestUnit* unit) {
     TestUTF8ByteCount* data = (TestUTF8ByteCount*) unit->data;
-    int64_t actual = utf8_byte_count(data->payload);
+    int64_t actual = utf8_byte_count(data->src);
 
     // Check if the actual count matches the expected count
     ASSERT_EQ(
         actual,
         data->expected,
-        "[TestUTF8ByteCount] Failed: unit=%zu, payload='%s', expected=%ld, got=%ld",
+        "[TestUTF8ByteCount] Failed: unit=%zu, src='%s', expected=%ld, got=%ld",
         unit->index,
-        data->payload,
+        data->src,
         data->expected,
         actual
     );
@@ -63,7 +63,7 @@ int test_suite_utf8_byte_count(void) {
 
 typedef struct TestUTF8ByteDiff {
     const char* label;
-    const uint8_t* payload;
+    const uint8_t* src;
     const ptrdiff_t start;
     const ptrdiff_t end;
     const ptrdiff_t expected;
@@ -71,16 +71,16 @@ typedef struct TestUTF8ByteDiff {
 
 int test_group_utf8_byte_diff(TestUnit* unit) {
     TestUTF8ByteDiff* data = (TestUTF8ByteDiff*) unit->data;
-    const uint8_t* start = data->payload ? data->payload + data->start : NULL;
-    const uint8_t* end = data->payload ? data->payload + data->end : NULL;
+    const uint8_t* start = data->src ? data->src + data->start : NULL;
+    const uint8_t* end = data->src ? data->src + data->end : NULL;
     ptrdiff_t actual = utf8_byte_diff(start, end);
 
     ASSERT_EQ(
         actual,
         data->expected,
-        "[TestUTF8ByteDiff] Failed: unit=%zu, payload='%s', expected=%ld, got=%ld",
+        "[TestUTF8ByteDiff] Failed: unit=%zu, src='%s', expected=%ld, got=%ld",
         unit->index,
-        data->payload ? (char*) data->payload : "NULL",
+        data->src ? (char*) data->src : "NULL",
         data->expected,
         actual
     );
@@ -116,16 +116,16 @@ int test_suite_utf8_byte_diff(void) {
 
 typedef struct TestUTF8ByteCopy {
     const char* label;
-    const uint8_t* payload;
+    const uint8_t* src;
     const uint8_t* expected;
 } TestUTF8ByteCopy;
 
 int test_group_utf8_byte_copy(TestUnit* unit) {
     TestUTF8ByteCopy* data = (TestUTF8ByteCopy*) unit->data;
-    uint8_t* actual = utf8_byte_copy(data->payload);
+    uint8_t* actual = utf8_byte_copy(data->src);
 
     // Check NULL sets
-    if (NULL == data->payload) {
+    if (NULL == data->src) {
         ASSERT_EQ(
             actual,
             NULL,
@@ -135,7 +135,7 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
     }
 
     // Compare length
-    int64_t count = utf8_byte_count(data->payload);
+    int64_t count = utf8_byte_count(data->src);
     int64_t actual_count = utf8_byte_count(actual);
 
     ASSERT_EQ(
@@ -143,7 +143,7 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
         count,
         "[TestUTF8ByteCopy] Failed: unit=%zu, input='%s', expected length=%ld, got=%ld",
         unit->index,
-        data->payload ? (char*) data->payload : "NULL",
+        data->src ? (char*) data->src : "NULL",
         count,
         actual_count
     );
@@ -152,7 +152,7 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
     for (int64_t i = 0; i <= count; i++) {
         ASSERT_EQ(
             actual[i],
-            data->payload[i],
+            data->src[i],
             "[TestUTF8ByteCopy] Failed: unit=%zu, index=%ld, expected=%c, got=%c",
             unit->index,
             i,
@@ -162,11 +162,11 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
     }
 
     // NULL is an aliased pointer
-    if (actual != NULL && data->payload != NULL) {
+    if (actual != NULL && data->src != NULL) {
         // Test for aliasing
         ASSERT_NEQ(
             (uintptr_t) actual,
-            (uintptr_t) data->payload,
+            (uintptr_t) data->src,
             "[TestUTF8ByteCopy] Failed: unit=%zu, returned pointer alias input (shallow copy)",
             unit->index
         );
@@ -203,16 +203,16 @@ int test_suite_utf8_byte_copy(void) {
 
 typedef struct TestUTF8ByteCopyN {
     const char* label;
-    const uint8_t* payload;
+    const uint8_t* src;
     uint64_t n;
     const uint8_t* expected;
 } TestUTF8ByteCopyN;
 
 int test_group_utf8_byte_copy_n(TestUnit* unit) {
     TestUTF8ByteCopyN* data = (TestUTF8ByteCopyN*) unit->data;
-    uint8_t* actual = utf8_byte_copy_n(data->payload, data->n);
+    uint8_t* actual = utf8_byte_copy_n(data->src, data->n);
 
-    if (actual && data->payload) {
+    if (actual && data->src) {
         // Compare output byte-by-byte
         int64_t count = utf8_byte_count(data->expected);
         int64_t result = memcmp(actual, data->expected, count + 1);
@@ -230,7 +230,7 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
         // No aliasing
         ASSERT_NEQ(
             (uintptr_t) actual,
-            (uintptr_t) data->payload,
+            (uintptr_t) data->src,
             "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, result is aliased",
             unit->index,
             data->label
