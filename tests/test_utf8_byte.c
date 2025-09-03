@@ -244,7 +244,7 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
         ASSERT_NEQ(
             (uintptr_t) actual,
             (uintptr_t) data->payload,
-            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, returned pointer alias input",
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, result is aliased",
             unit->index,
             data->label
         );
@@ -257,6 +257,8 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
 int test_suite_utf8_byte_copy_n(void) {
     TestUTF8ByteCopyN data[] = {
         {"NULL", NULL, 1, NULL},
+        {"Empty, n=0", (uint8_t*) "", 0, (uint8_t*)""},
+        {"Empty, n=1", (uint8_t*) "", 1, NULL},
     };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCopyN);
 
