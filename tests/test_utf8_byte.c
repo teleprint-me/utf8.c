@@ -3,6 +3,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "byte.h"
 #include "test.h"
@@ -211,12 +212,52 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
     TestUTF8ByteCopyN* data = (TestUTF8ByteCopyN*) unit->data;
     uint8_t* actual = utf8_byte_copy_n(data->payload, data->n);
 
+    if (!actual || !data->expected) {
+        // Expect failure (NULL result)
+        ASSERT_EQ(
+            actual,
+            data->expected,
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, expected='%s', got '%s'",
+            unit->index,
+            data->label,
+            data->expected ? (char*) data->expected : "NULL",
+            actual ? (char*) actual : "NULL"
+        );
+    }
+
+    if (actual && data->payload) {
+        // Compare output byte-by-byte
+        int64_t count = utf8_byte_count(data->expected);
+        int64_t result = memcmp(actual, data->expected, count + 1);
+
+        ASSERT_EQ(
+            result,
+            0,  // expected
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, expected='%s', got='%s'",
+            unit->index,
+            data->label,
+            data->expected,
+            actual
+        );
+
+        // No aliasing
+        ASSERT_NEQ(
+            (uintptr_t) actual,
+            (uintptr_t) data->payload,
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, returned pointer alias input",
+            unit->index,
+            data->label
+        );
+    }
+
     free(actual);
     return 0;
 }
 
 int test_suite_utf8_byte_copy_n(void) {
-    TestUTF8ByteCopyN data[] = {0};
+    TestUTF8ByteCopyN data[] = {
+        {"NULL", NULL, 1, NULL},
+    };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCopyN);
 
     TestUnit units[count];
