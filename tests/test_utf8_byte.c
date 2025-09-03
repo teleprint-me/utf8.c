@@ -200,6 +200,39 @@ int test_suite_utf8_byte_copy(void) {
     return test_group_run(&group);
 }
 
+typedef struct TestUTF8ByteCopyN {
+    const char* label;
+    const uint8_t* payload;
+    uint64_t n;
+    const uint8_t* expected;
+} TestUTF8ByteCopyN;
+
+int test_group_utf8_byte_copy_n(TestUnit* unit) {
+    TestUTF8ByteCopyN* data = (TestUTF8ByteCopyN*) unit->data;
+    uint8_t* actual = utf8_byte_copy_n(data->payload, data->n);
+    (void) actual;
+    return 0;
+}
+
+int test_suite_utf8_byte_copy_n(void) {
+    TestUTF8ByteCopyN data[] = {0};
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteCopyN);
+
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "utf8_byte_copy_n",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_copy_n,
+    };
+
+    return test_group_run(&group);
+}
+
 typedef struct TestUtf8ByteCmp {
     const char* label;
     const uint8_t* a;
@@ -244,7 +277,6 @@ int test_suite_utf8_byte_cmp(void) {
          (uint8_t*) "\xE2\x82\xAC",
          (uint8_t*) "\xC2\xA2",
          UTF8_COMPARE_GREATER},  // € vs ¢
-
     };
     size_t count = sizeof(data) / sizeof(TestUtf8ByteCmp);
 
@@ -268,6 +300,7 @@ int main(void) {
         {"utf8_byte_count", test_suite_utf8_byte_count},
         {"utf8_byte_diff", test_suite_utf8_byte_diff},
         {"utf8_byte_copy", test_suite_utf8_byte_copy},
+        {"utf8_byte_copy_n", test_suite_utf8_byte_copy_n},
         {"utf8_byte_cmp", test_suite_utf8_byte_cmp},
     };
     size_t count = sizeof(suites) / sizeof(TestSuite);
