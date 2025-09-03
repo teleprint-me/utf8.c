@@ -281,6 +281,57 @@ int test_suite_utf8_byte_copy_n(void) {
     return test_group_run(&group);
 }
 
+typedef struct TestUTF8ByteCopySlice {
+    const char* label;
+    const uint8_t* src;
+    const ptrdiff_t start;
+    const ptrdiff_t end;
+    const uint8_t* expected;
+} TestUTF8ByteCopySlice;
+
+int test_group_utf8_byte_slice(TestUnit* unit) {
+    TestUTF8ByteCopySlice* data = (TestUTF8ByteCopySlice*) unit->data;
+    const uint8_t* start = data->src ? data->src + data->start : NULL;
+    const uint8_t* end = data->src ? data->src + data->end : NULL;
+    uint8_t* actual = utf8_byte_copy_slice(start, end);
+
+    if (actual && data->src) {
+    } else {
+        // Expect failure (NULL result)
+        ASSERT_EQ(
+            actual,
+            data->expected,
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected='%s', got '%s'",
+            unit->index,
+            data->label,
+            data->expected ? (char*) data->expected : "NULL",
+            actual ? (char*) actual : "NULL"
+        );
+    }
+
+    free(actual);
+    return 0;
+}
+
+int test_suite_utf8_byte_slice(void) {
+    TestUTF8ByteCopySlice data[] = {0};
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteCopySlice);
+
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "utf8_byte_slice",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_slice,
+    };
+
+    return test_group_run(&group);
+}
+
 typedef struct TestUtf8ByteCmp {
     const char* label;
     const uint8_t* a;
@@ -349,6 +400,7 @@ int main(void) {
         {"utf8_byte_diff", test_suite_utf8_byte_diff},
         {"utf8_byte_copy", test_suite_utf8_byte_copy},
         {"utf8_byte_copy_n", test_suite_utf8_byte_copy_n},
+        {"utf8_byte_slice", test_suite_utf8_byte_slice},
         {"utf8_byte_cmp", test_suite_utf8_byte_cmp},
     };
     size_t count = sizeof(suites) / sizeof(TestSuite);
