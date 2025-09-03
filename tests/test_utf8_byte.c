@@ -200,11 +200,62 @@ int test_suite_utf8_byte_copy(void) {
     return test_group_run(&group);
 }
 
+typedef struct TestUtf8ByteCmp {
+    const char* label;
+    const uint8_t* a;
+    const uint8_t* b;
+    UTF8ByteCompare expected;
+} TestUtf8ByteCmp;
+
+int test_group_utf8_byte_cmp(TestUnit* unit) {
+    TestUtf8ByteCmp* data = (TestUtf8ByteCmp*) unit->data;
+    UTF8ByteCompare actual = utf8_byte_cmp(data->a, data->b);
+
+    ASSERT_EQ(
+        actual,
+        data->expected,
+        "[TestUtf8ByteCmp] Failed: unit=%zu, a='%s', b='%s', expected=%d, got=%d",
+        unit->index,
+        data->a,
+        data->b,
+        data->expected,
+        actual
+    );
+
+    return 0;
+}
+
+int test_suite_utf8_byte_cmp(void) {
+    TestUtf8ByteCmp data[] = {
+        {"Invalid", NULL, NULL, UTF8_COMPARE_INVALID},  // -2
+        {"Empty", (uint8_t*) "", (uint8_t*) "", UTF8_COMPARE_EQUAL},  // 0
+        {"Equal", (uint8_t*) "abc", (uint8_t*) "abc", UTF8_COMPARE_EQUAL},  // 0
+        {"Less", (uint8_t*) "abc", (uint8_t*) "def", UTF8_COMPARE_LESS},  // -1
+        {"Greater", (uint8_t*) "def", (uint8_t*) "abc", UTF8_COMPARE_GREATER},  // 1
+    };
+    size_t count = sizeof(data) / sizeof(TestUtf8ByteCmp);
+
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "utf8_byte_cmp",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_cmp,
+    };
+
+    return test_group_run(&group);
+}
+
 int main(void) {
     TestSuite suites[] = {
         {"utf8_byte_count", test_suite_utf8_byte_count},
         {"utf8_byte_diff", test_suite_utf8_byte_diff},
         {"utf8_byte_copy", test_suite_utf8_byte_copy},
+        {"utf8_byte_cmp", test_suite_utf8_byte_cmp},
     };
     size_t count = sizeof(suites) / sizeof(TestSuite);
 
