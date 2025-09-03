@@ -210,7 +210,8 @@ typedef struct TestUTF8ByteCopyN {
 int test_group_utf8_byte_copy_n(TestUnit* unit) {
     TestUTF8ByteCopyN* data = (TestUTF8ByteCopyN*) unit->data;
     uint8_t* actual = utf8_byte_copy_n(data->payload, data->n);
-    (void) actual;
+
+    free(actual);
     return 0;
 }
 
