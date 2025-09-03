@@ -162,8 +162,8 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
 
     // Check for aliasing
     ASSERT_NEQ(
-        actual,
-        data->payload,
+        (uintptr_t) actual,
+        (uintptr_t) data->payload,
         "[TestUTF8ByteCopy] Failed: unit=%zu, returned pointer alias input (shallow copy)",
         unit->index
     );
@@ -173,8 +173,14 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
 }
 
 int test_suite_utf8_byte_copy(void) {
-    TestUTF8ByteDiff data[] = {0};
-    size_t count = sizeof(data) / sizeof(TestUTF8ByteDiff);
+    TestUTF8ByteCopy data[] = {
+        {"NULL", NULL, NULL},
+        {"Empty", (uint8_t*) "", (uint8_t*) ""},
+        {"ASCII", (uint8_t*) "abc", (uint8_t*) "abc"},
+        {"2-byte", (uint8_t*) "\u00A2", (uint8_t*) "\u00A2"},
+        {"Long", (uint8_t*) "Hello, world!", (uint8_t*) "Hello, world!"},
+    };
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteCopy);
 
     TestUnit units[count];
     for (size_t i = 0; i < count; i++) {
