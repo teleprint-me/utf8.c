@@ -160,13 +160,16 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
         );
     }
 
-    // Check for aliasing
-    ASSERT_NEQ(
-        (uintptr_t) actual,
-        (uintptr_t) data->payload,
-        "[TestUTF8ByteCopy] Failed: unit=%zu, returned pointer alias input (shallow copy)",
-        unit->index
-    );
+    // NULL is an aliased pointer
+    if (actual != NULL && data->payload != NULL) {
+        // Test for aliasing
+        ASSERT_NEQ(
+            (uintptr_t) actual,
+            (uintptr_t) data->payload,
+            "[TestUTF8ByteCopy] Failed: unit=%zu, returned pointer alias input (shallow copy)",
+            unit->index
+        );
+    }
 
     free(actual);
     return 0;
