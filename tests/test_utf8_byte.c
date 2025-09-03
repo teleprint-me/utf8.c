@@ -123,22 +123,50 @@ int test_group_utf8_byte_copy(TestUnit* unit) {
     TestUTF8ByteCopy* data = (TestUTF8ByteCopy*) unit->data;
     uint8_t* actual = utf8_byte_copy(data->payload);
 
-    int64_t count = utf8_byte_count(data->payload);
-    if (-1 == count) {
-        return 1;
+    // Check NULL sets
+    if (NULL == data->payload) {
+        ASSERT_EQ(
+            actual,
+            NULL,
+            "[TestUTF8ByteCopy]Failed: unit=%zu, input=NULL, expected NULL, got non-NULL",
+            unit->index
+        );
     }
 
-    for (int64_t i = 0; i < count; i++) {
+    // Compare length
+    int64_t count = utf8_byte_count(data->payload);
+    int64_t actual_count = utf8_byte_count(actual);
+
+    ASSERT_EQ(
+        actual_count,
+        count,
+        "[TestUTF8ByteCopy] Failed: unit=%zu, input='%s', expected length=%ld, got=%ld",
+        unit->index,
+        data->payload ? (char*) data->payload : "NULL",
+        count,
+        actual_count
+    );
+
+    // Compare contents (including null byte)
+    for (int64_t i = 0; i <= count; i++) {
         ASSERT_EQ(
             actual[i],
             data->payload[i],
-            "[TestUTF8ByteCopy] Failed: unit=%zu, payload='%s', expected=%c, got=%c",
+            "[TestUTF8ByteCopy] Failed: unit=%zu, index=%ld, expected=%c, got=%c",
             unit->index,
-            (data->payload) ? (char*) data->payload : "NULL",
-            (char) data->expected[i],
-            (char) actual[i]
+            i,
+            (unsigned char) data->expected[i],
+            (unsigned char) actual[i]
         );
     }
+
+    // Check for aliasing
+    ASSERT_NEQ(
+        actual,
+        data->payload,
+        "[TestUTF8ByteCopy] Failed: unit=%zu, returned pointer alias input (shallow copy)",
+        unit->index
+    );
 
     free(actual);
     return 0;
