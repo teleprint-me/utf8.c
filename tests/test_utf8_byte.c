@@ -212,19 +212,6 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
     TestUTF8ByteCopyN* data = (TestUTF8ByteCopyN*) unit->data;
     uint8_t* actual = utf8_byte_copy_n(data->payload, data->n);
 
-    if (!actual || !data->expected) {
-        // Expect failure (NULL result)
-        ASSERT_EQ(
-            actual,
-            data->expected,
-            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, expected='%s', got '%s'",
-            unit->index,
-            data->label,
-            data->expected ? (char*) data->expected : "NULL",
-            actual ? (char*) actual : "NULL"
-        );
-    }
-
     if (actual && data->payload) {
         // Compare output byte-by-byte
         int64_t count = utf8_byte_count(data->expected);
@@ -248,6 +235,17 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
             unit->index,
             data->label
         );
+    } else {
+        // Expect failure (NULL result)
+        ASSERT_EQ(
+            actual,
+            data->expected,
+            "[TestUTF8ByteCopyN] Failed: unit=%zu, label=%s, expected='%s', got '%s'",
+            unit->index,
+            data->label,
+            data->expected ? (char*) data->expected : "NULL",
+            actual ? (char*) actual : "NULL"
+        );
     }
 
     free(actual);
@@ -257,8 +255,14 @@ int test_group_utf8_byte_copy_n(TestUnit* unit) {
 int test_suite_utf8_byte_copy_n(void) {
     TestUTF8ByteCopyN data[] = {
         {"NULL", NULL, 1, NULL},
-        {"Empty, n=0", (uint8_t*) "", 0, (uint8_t*)""},
+        {"Empty, n=0", (uint8_t*) "", 0, (uint8_t*) ""},
         {"Empty, n=1", (uint8_t*) "", 1, NULL},
+        {"ASCII full", (uint8_t*) "abc", 3, (uint8_t*) "abc"},
+        {"ASCII partial", (uint8_t*) "abc", 2, (uint8_t*) "ab"},
+        {"ASCII n=0", (const uint8_t*) "abc", 0, (const uint8_t*) ""},
+        {"n > len", (const uint8_t*) "abc", 5, NULL},
+        {"Multi-byte", (const uint8_t*) "\u20ACabc", 3, (const uint8_t*) "\u20AC"},  // euro sign
+        {"Multi-byte partial", (const uint8_t*) "\u20ACabc", 4, (const uint8_t*) "\u20ACa"},
     };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCopyN);
 
