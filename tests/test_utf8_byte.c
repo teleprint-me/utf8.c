@@ -345,7 +345,18 @@ int test_group_utf8_byte_copy_slice(TestUnit* unit) {
 }
 
 int test_suite_utf8_byte_copy_slice(void) {
-    TestUTF8ByteCopySlice data[] = {0};
+    TestUTF8ByteCopySlice data[] = {
+        {"NULL start", NULL, 0, 1, NULL},
+        {"NULL end", (const uint8_t*) "abc", 0, -1, NULL},
+        {"end < start", (const uint8_t*) "abc", 2, 1, NULL},
+        {"start == end", (const uint8_t*) "abc", 1, 1, (const uint8_t*) ""},
+        {"full string", (const uint8_t*) "Hello", 0, 5, (const uint8_t*) "Hello"},
+        {"first 2", (const uint8_t*) "Hello", 0, 2, (const uint8_t*) "He"},
+        {"last 3", (const uint8_t*) "Hello", 2, 5, (const uint8_t*) "llo"},
+        {"middle", (const uint8_t*) "Hello", 1, 4, (const uint8_t*) "ell"},
+        {"unicode euro", (const uint8_t*) "\u20ACabc", 0, 3, (const uint8_t*) "\u20AC"},
+        {"unicode + ascii", (const uint8_t*) "\u20ACabc", 0, 4, (const uint8_t*) "\u20ACa"},
+    };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCopySlice);
 
     TestUnit units[count];
