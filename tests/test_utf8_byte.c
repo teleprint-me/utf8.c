@@ -374,7 +374,89 @@ int test_suite_utf8_byte_copy_slice(void) {
     return test_group_run(&group);
 }
 
-typedef struct TestUtf8ByteCmp {
+typedef struct TestUTF8ByteCat {
+    const char* label;
+    const uint8_t* dst;
+    const uint8_t* src;
+    const uint8_t* expected;
+} TestUTF8ByteCat;
+
+int test_group_utf8_byte_cat(TestUnit* unit) {
+    TestUTF8ByteCat* data = (TestUTF8ByteCat*) unit->data;
+    uint8_t* actual = utf8_byte_cat(data->dst, data->src);
+
+    if (actual && data->expected) {
+        int64_t src_len = utf8_byte_count(data->dst);
+        int64_t dst_len = utf8_byte_count(data->src);
+        int64_t actual_len = utf8_byte_count(actual);
+        int64_t expected_len = src_len + dst_len;
+        ASSERT_EQ(
+            actual_len,
+            expected_len,
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected len=%ld, got=%ld",
+            unit->index,
+            data->label,
+            expected_len,
+            actual_len
+        );
+
+        int64_t result = memcmp(actual, data->expected, expected_len + 1);
+        ASSERT_EQ(
+            result,
+            0,  // expected
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected='%s', got='%s'",
+            unit->index,
+            data->label,
+            data->expected,
+            actual
+        );
+
+        // No aliasing
+        ASSERT_NEQ(
+            (uintptr_t) actual,
+            (uintptr_t) data->expected,
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, result is aliased",
+            unit->index,
+            data->label
+        );
+    } else {
+        // Expect failure (NULL result)
+        ASSERT_EQ(
+            actual,
+            data->expected,
+            "[TestUTF8ByteCopySlice] Failed: unit=%zu, label=%s, expected='%s', got '%s'",
+            unit->index,
+            data->label,
+            data->expected ? (char*) data->expected : "NULL",
+            actual ? (char*) actual : "NULL"
+        );
+    }
+
+    return 0;
+}
+
+int test_suite_utf8_byte_cat(void) {
+    TestUTF8ByteCat data[] = {
+        {"NULL", NULL, NULL, NULL},
+    };
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteCat);
+
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "utf8_byte_cat",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_cat,
+    };
+
+    return test_group_run(&group);
+}
+
+typedef struct TestUTF8ByteCmp {
     const char* label;
     const uint8_t* a;
     const uint8_t* b;
@@ -443,6 +525,7 @@ int main(void) {
         {"utf8_byte_copy", test_suite_utf8_byte_copy},
         {"utf8_byte_copy_n", test_suite_utf8_byte_copy_n},
         {"utf8_byte_copy_slice", test_suite_utf8_byte_copy_slice},
+        {"utf8_byte_cat", test_suite_utf8_byte_cat},
         {"utf8_byte_cmp", test_suite_utf8_byte_cmp},
     };
     size_t count = sizeof(suites) / sizeof(TestSuite);
