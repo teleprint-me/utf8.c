@@ -432,12 +432,14 @@ int test_group_utf8_byte_cat(TestUnit* unit) {
         );
     }
 
+    free(actual);
     return 0;
 }
 
 int test_suite_utf8_byte_cat(void) {
     TestUTF8ByteCat data[] = {
         {"NULL", NULL, NULL, NULL},
+        {"ASCII", (uint8_t*) "abc", (uint8_t*) "def", (uint8_t*) "abcdef"},
     };
     size_t count = sizeof(data) / sizeof(TestUTF8ByteCat);
 
