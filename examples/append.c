@@ -5,9 +5,9 @@
 
 int main(void) {
     // copy stack strings to heap
-    uint8_t* arr1 = utf8_byte_copy((uint8_t*)"abc");
-    uint8_t* arr2 = utf8_byte_copy((uint8_t*)"def");
-    uint8_t* arr3 = utf8_byte_copy((uint8_t*)"ghi");
+    uint8_t* arr1 = utf8_byte_copy((uint8_t*) "abc");
+    uint8_t* arr2 = utf8_byte_copy((uint8_t*) "def");
+    uint8_t* arr3 = utf8_byte_copy((uint8_t*) "ghi");
 
     uint64_t count = 0;
     uint8_t** parts = calloc(1, sizeof(uint8_t*));
