@@ -16,7 +16,6 @@
 #include <string.h>  // only for mem*() functions
 #include <stdio.h>
 
-#include "byte.h"
 #include "codepoint.h"
 #include "grapheme-data.h"
 #include "grapheme.h"

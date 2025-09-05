@@ -18,7 +18,6 @@
 #include <string.h>  // memcpy and friends
 #include <stdio.h>
 
-#include "byte.h"
 #include "codepoint.h"
 
 // --- UTF-8 Codepoint Operations ---

@@ -14,6 +14,7 @@
 
 #ifndef UTF8_GRAPHEME_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h> // only for mem*() functions
 #include <stdio.h>
