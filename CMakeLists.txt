@@ -47,3 +47,4 @@ target_link_libraries(utf8 PUBLIC m pcre2-8)
 
 enable_testing()
 add_subdirectory(tests)
+add_subdirectory(examples)
