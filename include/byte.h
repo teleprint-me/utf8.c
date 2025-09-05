@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/utf8/byte.h
+ * @file utf8/include/byte.h
  * @brief UTF-8 byte-oriented string utilities.
  *
  * Low-level routines for working directly with bytes in null-terminated UTF-8 strings.
@@ -105,8 +105,6 @@ typedef enum UTF8ByteCompare {
  * @note Comparison stops at the first differing byte or at the null terminator.
  */
 int8_t utf8_byte_cmp(const uint8_t* a, const uint8_t* b);
-
-void* utf8_byte_realloc(void* ptr, size_t old_size, size_t new_size);
 
 /**
  * @brief Appends a pointer to a dynamic array of uint8_t* pointers, resizing as needed.

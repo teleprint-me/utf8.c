@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/utf8/byte.c
+ * @file utf8/src/byte.c
  * @brief UTF-8 byte-oriented string utilities.
  *
  * Low-level routines for working directly with bytes in null-terminated UTF-8 strings.
@@ -161,36 +161,13 @@ int8_t utf8_byte_cmp(const uint8_t* a, const uint8_t* b) {
     return UTF8_COMPARE_EQUAL;
 }
 
-void* utf8_byte_realloc(void* ptr, size_t old_size, size_t new_size) {
-    if (NULL == ptr) {
-        return calloc(new_size, sizeof(uint8_t));
-    }
-
-    if (0 == new_size) {
-        free(ptr);
-        return NULL;
-    }
-
-    void* new_ptr = calloc(new_size, sizeof(uint8_t));
-    if (NULL == new_ptr) {
-        return NULL;
-    }
-
-    // Copy only the smaller of the old or new sizes
-    size_t min_size = old_size < new_size ? old_size : new_size;
-    memcpy(new_ptr, ptr, min_size);
-    free(ptr);
-    return new_ptr;
-}
-
 uint8_t** utf8_byte_append(const uint8_t* src, uint8_t** parts, uint64_t* count) {
     if (!src || !parts || !count) {
         return NULL;
     }
 
-    size_t old_size = sizeof(uint8_t*) * (*count);
     size_t new_size = sizeof(uint8_t*) * (*count + 1);
-    uint8_t** temp = utf8_byte_realloc(parts, old_size, new_size);
+    uint8_t** temp = realloc(parts, new_size);
     if (!temp) {
         return NULL;
     }

@@ -496,9 +496,8 @@ uint8_t** utf8_cp_split(const uint8_t* start, size_t* capacity) {
             goto fail;
         }
 
-        uint8_t** temp = utf8_byte_realloc(
+        uint8_t** temp = realloc(
             parts,
-            sizeof(uint8_t*) * (*capacity),  // old_size
             sizeof(uint8_t*) * (*capacity + 1)  // new_size
         );
 

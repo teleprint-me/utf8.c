@@ -236,9 +236,8 @@ char** utf8_gcb_split(const char* src, size_t* capacity) {
             memcpy(cluster, &stream[cluster_start], cluster_len);
             cluster[cluster_len] = '\0';
 
-            parts = utf8_byte_realloc(
+            parts = realloc(
                 parts,
-                sizeof(char*) * (*capacity), // old size
                 sizeof(char*) * (*capacity + 1) // new_size
             );
             parts[(*capacity)++] = cluster;
@@ -256,9 +255,8 @@ char** utf8_gcb_split(const char* src, size_t* capacity) {
         memcpy(cluster, &stream[cluster_start], cluster_len);
         cluster[cluster_len] = '\0';
 
-        parts = utf8_byte_realloc(
+        parts = realloc(
             parts,
-            sizeof(char*) * (*capacity), // old size
             sizeof(char*) * (*capacity + 1) // new size
         );
         parts[(*capacity)++] = cluster;
