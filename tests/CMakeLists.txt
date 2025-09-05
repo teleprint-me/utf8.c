@@ -1,4 +1,4 @@
-# @file tests/utf8/CMakeLists.txt
+# @file utf8/tests/CMakeLists.txt
 
 # Define test units
 set(TEST_UNITS
